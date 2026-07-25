@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* Marketing site is fully client-rendered motion/3D; no special config needed. */
 };
 
 export default nextConfig;

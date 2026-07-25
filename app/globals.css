@@ -1,26 +1,324 @@
 @import "tailwindcss";
 
+/* ============================================================
+   NORTHSTAR — DESIGN SYSTEM
+   Dark, cinematic, premium. One electric accent (indigo).
+   Tailwind v4 theme tokens → utilities (bg-bg, text-ink, etc.)
+   ============================================================ */
+
+@theme {
+  /* --- surfaces --- */
+  --color-bg: #08090c;
+  --color-surface: #0f1116;
+  --color-surface-2: #14161c;
+  --color-elevated: #191c24;
+
+  /* --- text --- */
+  --color-ink: #f5f6f8;
+  --color-muted: #9aa0aa;
+  --color-faint: #6a707c;
+
+  /* --- the one electric accent --- */
+  --color-accent: #6366f1;
+  --color-accent-bright: #818cf8;
+  --color-accent-deep: #4f46e5;
+
+  /* --- lines --- */
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+
+  /* --- fonts (wired from next/font in layout.tsx) --- */
+  --font-display: var(--font-space-grotesk), "Space Grotesk", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace,
+    monospace;
+  --font-serif: var(--font-instrument-serif), "Instrument Serif", ui-serif,
+    Georgia, serif;
+
+  /* --- radii --- */
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  /* --- easing --- */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* --- named animations → animate-* utilities --- */
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 42s linear infinite;
+  --animate-float: float 9s var(--ease-out-expo) infinite;
+  --animate-float-slow: float 14s var(--ease-out-expo) infinite;
+  --animate-pulse-glow: pulse-glow 4.5s ease-in-out infinite;
+  --animate-aurora: aurora 18s ease infinite;
+  --animate-spin-slow: spin 26s linear infinite;
+  --animate-shimmer: shimmer 2.6s linear infinite;
+  --animate-scroll-hint: scroll-hint 2.2s ease-in-out infinite;
+}
+
+/* ---------- ambient background tuning knobs (see AmbientBackground) ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --amb-grid: 0.03; /* grid line alpha  (<=4%) */
+  --amb-grain: 0.035; /* film grain      (<=4%) */
+  --amb-vignette: 0.5; /* edge darkening */
+  --amb-glow-top: 0.5; /* faint glow behind the nav */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ---------- keyframes ---------- */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-14px) translateX(6px);
+  }
+}
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(4%, -6%) rotate(8deg) scale(1.1);
+  }
+  66% {
+    transform: translate(-5%, 4%) rotate(-6deg) scale(0.96);
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+@keyframes scroll-hint {
+  0% {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  40% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------- base ---------- */
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* hard base color behind the fixed <AmbientBackground/> (-z-10) */
+    background-color: var(--color-bg);
+  }
+
+  body {
+    /* transparent so the global ambient layer shows through */
+    background-color: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 55%, transparent);
+    color: #fff;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  /* nicer focus ring */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-bright);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Lenis smooth-scroll hooks */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+}
+
+/* ---------- reusable component classes ---------- */
+@layer components {
+  /* page container */
+  .shell {
+    width: 100%;
+    max-width: 80rem; /* 1280px */
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 2.5rem);
+  }
+
+  /* uppercase eyebrow label */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* glassy surface */
+  .glass {
+    background: color-mix(in oklab, var(--color-surface) 72%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--color-line);
+  }
+
+  /* accent gradient text */
+  .text-gradient {
+    background: linear-gradient(
+      100deg,
+      var(--color-ink) 0%,
+      var(--color-ink) 40%,
+      var(--color-accent-bright) 78%,
+      var(--color-accent) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* faint dot grid background */
+  .bg-dots {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 0
+    );
+    background-size: 28px 28px;
+  }
+
+  /* faint line grid background */
+  .bg-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.045) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* radial mask fade for backgrounds */
+  .mask-fade {
+    -webkit-mask-image: radial-gradient(
+      ellipse 70% 60% at 50% 40%,
+      #000 30%,
+      transparent 78%
+    );
+    mask-image: radial-gradient(
+      ellipse 70% 60% at 50% 40%,
+      #000 30%,
+      transparent 78%
+    );
+  }
+
+  /* accent glow shadow */
+  .glow-accent {
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 30%, transparent),
+      0 20px 60px -12px color-mix(in oklab, var(--color-accent) 45%, transparent);
+  }
+
+  /* card base */
+  .card {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface) 90%, transparent),
+      color-mix(in oklab, var(--color-surface-2) 90%, transparent)
+    );
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl);
+  }
+}
+
+/* ---------- utilities ---------- */
+@utility text-shadow-glow {
+  text-shadow: 0 0 40px color-mix(in oklab, var(--color-accent) 40%, transparent);
+}
+
+/* thin custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #23262f;
+  border-radius: 999px;
+  border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2e323d;
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
